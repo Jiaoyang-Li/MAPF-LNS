@@ -342,11 +342,11 @@ bool LNS::runWinPIBT(){
     std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
 
     MAPF P = preparePIBTProblem(shuffled_agents);
-    P.setTimestepLimit(pipp_option.timestepLimit);
 
     // seed for solver
     std::mt19937* MT_S = new std::mt19937(0);
     winPIBT solver(&P,pipp_option.windowSize,pipp_option.winPIBTSoft,MT_S);
+    solver.setTimeLimit(time_limit);
     bool result = solver.solve();
     if (result)
         updatePIBTResult(P.getA(),shuffled_agents);

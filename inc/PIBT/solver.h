@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <boost/heap/fibonacci_heap.hpp>
+typedef std::chrono::duration<float> fsec;
 
 
 class Solver {
@@ -36,6 +37,8 @@ protected:
   virtual void solveEnd();
   std::chrono::system_clock::time_point startT;
   std::chrono::system_clock::time_point endT;
+  double time_limit=0;
+
 
 public:
   Solver(Problem* _P);
@@ -46,6 +49,8 @@ public:
 
   virtual bool solve() { return false; };
   double getElapsed() { return elapsedTime; };
+  void setTimeLimit(double limit){this->time_limit=limit;};
 
-  virtual std::string logStr();
+
+    virtual std::string logStr();
 };
