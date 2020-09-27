@@ -7,43 +7,41 @@
 #include <unordered_map>
 #include "node.h"
 
-using Nodes = std::vector<Node*>;
-using Paths = std::vector<Nodes>;
-
+// cash calculated path
 struct KnownPath {
   Node* s;
   Node* g;
-  Nodes path;
+  std::vector<Node*> path;
 };
 
 class Graph {
 private:
-  // digraph or not
-  bool directed;
-
-  // register path or not
-  bool regFlg;
+  std::vector<Node*> getNeighbor(Node* v);
 
 protected:
   // nodes
-  Nodes nodes;
-
-  // cache of searched path
+  std::vector<Node*> nodes;
+  // adjacency matrix
+  std::vector<std::vector<int>> adjMatrix;
+  // objs
+  std::vector<int> objs;
+  // register path or not
+  bool regFlg;
+  // searched path
   std::unordered_map<std::string, KnownPath*> knownPaths;
-
   // random generator
   std::mt19937* MT;
 
-  // start and goals
-  Nodes starts;
-  Nodes goals;
-
   void init();
-  Nodes getPath(Node* s, Node* g, int (*dist)(Node*, Node*));
-  Nodes getPath(Node* s, Node* g, Nodes &prohibitedNodes,
-                int (*dist)(Node*, Node*));
+  virtual void initNodes();
+  void setNeighbor();
+  std::vector<Node*> getPath(Node* s, Node* g, int (*dist)(Node*, Node*));
+  std::vector<Node*> getPath(Node* s, Node* g,
+                             std::vector<Node*> &prohibitedNodes,
+                             int (*dist)(Node*, Node*));
   std::string getKeyForKnownPath(Node* s, Node* g);
-  void registerPath(const Nodes &path);
+  void registerPath(const std::vector<Node*> &path);
+
 
 public:
   Graph();
@@ -52,42 +50,37 @@ public:
 
   Node* getNode(int id);
   bool existNode(int id);
-  Nodes getNodes() { return nodes; }
   int getNodesNum() { return nodes.size(); }
   int getNodeIndex(Node* v);
   Node* getNodeFromIndex(int i) { return nodes[i]; }
 
-  Nodes neighbor(Node* v);
-  Nodes neighbor(int id);
+  void setObj(Node* v);
+  void setObj(int id);
+  void setObjs(std::vector<Node*> &objs);
+  void setObjs(std::vector<int> &ids);
 
-  // implemented in Grid class
+  std::vector<Node*> neighbor(Node* v);
+  std::vector<Node*> neighbor(int v);
+
   virtual int getW() { return 0; };
   virtual int getH() { return 0; };
 
-  // for Digraph
-  void setDirected(bool _directed) { directed = _directed; }
-  bool isDirected() { return directed; }
-
-  // register path or not
   void setRegFlg(bool flg) { regFlg = flg; }
 
-  // typical exampl: manhattan distance
+  std::vector<Node*> getNodes() { return nodes; }
+
   virtual int dist(Node* v1, Node* v2) { return 0; }
-  virtual Nodes getPath(Node* s, Node* g) { return {}; }
-  virtual Nodes getPath(Node* s, Node* g, Nodes &prohibitedNodes);
+  virtual std::vector<Node*> getPath(Node* s, Node* g) { return {}; }
+  virtual std::vector<Node*> getPath(Node* s, Node* g,
+                                     std::vector<Node*> &prohibitedNodes);
 
-  virtual Paths getStartGoal(int num);
-  // for iterative MAPF
-  virtual Node* getNewGoal(Node* v) { return v; }
+  virtual std::vector<std::vector<Node*>> getStartGoal(int num);
 
-  // for pickup and delivery
-  virtual Nodes getPickup() { return {}; }
-  virtual Nodes getDelivery() { return {}; }
-  virtual Nodes getEndpoints() { return {}; }
-  virtual Nodes getAllSpecialPoints() { return {}; }
+  // for MAPD
+  virtual std::vector<Node*> getPickup() { return {}; }
+  virtual std::vector<Node*> getDelivery() { return {}; }
+  virtual std::vector<Node*> getEndpoints() { return {}; }
+  virtual std::vector<Node*> getAllSpecialPoints() { return {}; }
 
-  // for iECBS
-  virtual std::string getMapName() { return ""; }
-
-  virtual std::string logStr() { return ""; };
+  virtual std::string logStr();
 };

@@ -41,7 +41,11 @@ void Solver::solveEnd() {
 
 void Solver::WarshallFloyd() {
   int nodeNum = G->getNodesNum();
-  Nodes neighbor;
+
+  std::cout << "start WarshallFloyd, "
+            << "it requires O(" << nodeNum << "^3) cost\n";
+
+  std::vector<Node*> neighbor;
   int INF = 100000;
   dists = Eigen::MatrixXi::Ones(nodeNum, nodeNum) * INF;
 
@@ -64,12 +68,14 @@ void Solver::WarshallFloyd() {
       }
     }
   }
+
+  std::cout << "finish WarshallFloyd" << "\n";
 }
 
 int Solver::getMaxLengthPaths(Paths& paths) {
   if (paths.empty()) return 0;
   auto itr = std::max_element(paths.begin(), paths.end(),
-                              [] (Nodes p1, Nodes p2) {
+                              [] (std::vector<Node*> p1, std::vector<Node*> p2) {
                                 return p1.size() < p2.size(); });
   return itr->size();
 }
@@ -94,11 +100,10 @@ int Solver::pathDist(Node* s, Node* g) {
   if (dist != 0) return dist;
 
   // new
-  Nodes path = G->getPath(s, g);
+  std::vector<Node*> path = G->getPath(s, g);
 
   dist = path.size() - 1;  // without start node
   int index, d, cost;
-  bool directed = G->isDirected();
 
   cost = dist;
   for (auto v : path) {
@@ -106,15 +111,12 @@ int Solver::pathDist(Node* s, Node* g) {
     d = dists(index, g_index);
     if ((index != g_index) && (d == 0)) {
       dists(index, g_index) = cost;
-      // if not directed graph
-      if (!directed) dists(g_index, index) = cost;
+      dists(g_index, index) = cost;
       --cost;
     } else if (d == cost) {
       break;
     } else {
       std::cout << "error@Solver::pathDist, "
-                << s->getId() << " -> " << g->getId() << ", "
-                << s->getPos() << " -> " << g->getPos() << ", "
                 << "not optimal path is obtained" << "\n";
       std::exit(1);
     }
@@ -123,14 +125,14 @@ int Solver::pathDist(Node* s, Node* g) {
   return dist;
 }
 
-int Solver::pathDist(Node* s, Node* g, Nodes &prohibited) {
+int Solver::pathDist(Node* s, Node* g, std::vector<Node*> &prohibited) {
   // same place?
   if (s == g) return 0;
 
-  return G->getPath(s, g, prohibited).size() - 1;
+  return G->getPath(s, g, prohibited).size() - 1;  // path includes start node
 }
 
-std::string Solver::getKey(int t, Node* v) {
+std::string Solver::getKey(int t, Node* v) {  // for A* search
   std::string key = "";
   key += std::to_string(t);
   key += "-";

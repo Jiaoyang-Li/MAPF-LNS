@@ -335,11 +335,11 @@ bool LNS::runPPS(){
     std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
 
     MAPF P = preparePIBTProblem(shuffled_agents);
-    P.setTimestepLimit(pipp_option.timestepLimit);
 
     // seed for solver
     std::mt19937* MT_S = new std::mt19937(0);
     PPS solver(&P,MT_S);
+    solver.setTimeLimit(time_limit);
 //    solver.WarshallFloyd();
     bool result = solver.solve();
     if (result)
@@ -351,11 +351,12 @@ bool LNS::runPIBT(){
      std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
 
     MAPF P = preparePIBTProblem(shuffled_agents);
-    P.setTimestepLimit(pipp_option.timestepLimit);
 
     // seed for solver
     std::mt19937* MT_S = new std::mt19937(0);
     PIBT solver(&P,MT_S);
+    solver.setTimeLimit(time_limit);
+
     bool result = solver.solve();
     if (result)
         updatePIBTResult(P.getA(),shuffled_agents);
@@ -363,19 +364,20 @@ bool LNS::runPIBT(){
 }
 
 bool LNS::runWinPIBT(){
-    auto shuffled_agents = neighbor.agents;
-    std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
-
-    MAPF P = preparePIBTProblem(shuffled_agents);
-    P.setTimestepLimit(pipp_option.timestepLimit);
-
-    // seed for solver
-    std::mt19937* MT_S = new std::mt19937(0);
-    winPIBT solver(&P,pipp_option.windowSize,pipp_option.winPIBTSoft,MT_S);
-    bool result = solver.solve();
-    if (result)
-        updatePIBTResult(P.getA(),shuffled_agents);
-    return result;
+//    auto shuffled_agents = neighbor.agents;
+//    std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
+//
+//    MAPF P = preparePIBTProblem(shuffled_agents);
+//    P.setTimestepLimit(pipp_option.timestepLimit);
+//
+//    // seed for solver
+//    std::mt19937* MT_S = new std::mt19937(0);
+//    winPIBT solver(&P,pipp_option.windowSize,pipp_option.winPIBTSoft,MT_S);
+//    bool result = solver.solve();
+//    if (result)
+//        updatePIBTResult(P.getA(),shuffled_agents);
+//    return result;
+return false;
 }
 
 MAPF LNS::preparePIBTProblem(vector<int> shuffled_agents){
@@ -384,10 +386,10 @@ MAPF LNS::preparePIBTProblem(vector<int> shuffled_agents){
     std::mt19937* MT_PG = new std::mt19937(0);
 
 //    Graph* G = new SimpleGrid(instance);
-    Graph* G = new SimpleGrid(instance.getMapFile());
+    Graph* G = new DAO(instance.getMapFile(), MT_PG);
 
     std::vector<Task*> T;
-    PIBT_Agents A;
+    AGENTS A;
 
     for (int i : shuffled_agents){
         assert(G->existNode(agents[i].path_planner.start_location));
@@ -409,7 +411,7 @@ MAPF LNS::preparePIBTProblem(vector<int> shuffled_agents){
 
 }
 
-void LNS::updatePIBTResult(const PIBT_Agents& A,vector<int> shuffled_agents){
+void LNS::updatePIBTResult(const AGENTS& A,vector<int> shuffled_agents){
     int soc = 0;
     for (int i=0; i<A.size();i++){
         int a_id = shuffled_agents[i];

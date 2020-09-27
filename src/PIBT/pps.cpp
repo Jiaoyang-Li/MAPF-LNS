@@ -2,10 +2,6 @@
  * pps.cpp
  *
  * Purpose: Parallel Push & Swap
- *
- * Sajid, Q., Luna, R., & Bekris, K. E. (2012).
- * Multi-Agent Pathfinding with Simultaneous Execution of Single-Agent Primitives.
- *
  * Created by: Keisuke Okumura <okumura.k@coord.c.titech.ac.jp>
  */
 
@@ -44,6 +40,7 @@ bool PPS::solve() {
   pushers = A;
   U.clear();
   L.clear();
+
   while (!P->isSolved()) {  // l.2
     update();
     if (!status) {
@@ -51,7 +48,7 @@ bool PPS::solve() {
       return false;
     }
     P->update();
-    if (P->getTimestep() >= P->getTimestepLimit()) {
+    if (time_limit && ( (fsec)(std::chrono::system_clock::now() - startT)).count() > time_limit){
         break;
     }
   }
@@ -114,22 +111,22 @@ void PPS::update() {
 
 // individual agent push
 RES PPS::PUSH(PIBT_Agent* c, bool swap) {
-  PIBT_Agents H = {};
-  Nodes T = {};
+  AGENTS H = {};
+  NODES T = {};
   return PUSH(c, H, T, swap);
 }
 
-RES PPS::PUSH(PIBT_Agent* c, PIBT_Agents& H, bool swap) {
-  Nodes T = {};
+RES PPS::PUSH(PIBT_Agent* c, AGENTS& H, bool swap) {
+  NODES T = {};
   return PUSH(c, H, T, swap);
 }
 
-RES PPS::PUSH(PIBT_Agent* c, Nodes &T, bool swap) {
-  PIBT_Agents H = {};
+RES PPS::PUSH(PIBT_Agent* c, NODES &T, bool swap) {
+  AGENTS H = {};
   return PUSH(c, H, T, swap);
 }
 
-RES PPS::PUSH(PIBT_Agent* c, PIBT_Agents &H, Nodes &T, bool swap) {
+RES PPS::PUSH(PIBT_Agent* c, AGENTS &H, NODES &T, bool swap) {
   if (inArray(c, H)) return RES::FAIL;   // l.1
   if (inArray(c, M)) return RES::PAUSE;  // l.2
   if (swap == false && inArray(c, U)) return PAUSE;  // l.3
@@ -137,7 +134,7 @@ RES PPS::PUSH(PIBT_Agent* c, PIBT_Agents &H, Nodes &T, bool swap) {
   auto itrU = std::find(U.begin(), U.end(), c);
   if (itrU != U.end()) U.erase(itrU);  // l.4
 
-  Nodes pi;
+  NODES pi;
   RES attempt;
   if (isTmpGoals[c->getId()]) {  // l.5, used when swapping, case 3
     S* s = getS(c);
@@ -157,7 +154,7 @@ RES PPS::PUSH(PIBT_Agent* c, PIBT_Agents &H, Nodes &T, bool swap) {
 
     // exclude swap detected agents
     if (attempt == RES::FAIL && !inArray(c, pusherToSwaper)) {  // l.12
-      Nodes Y = CLOSEST_EMPTY_VERTICLES(c);
+      NODES Y = CLOSEST_EMPTY_VERTICLES(c);
 
       if (!Y.empty()) {
         Node* g = c->getGoal();
@@ -201,7 +198,7 @@ RES PPS::PUSH(S* s) {
     return SWAP(s);
   }
 
-  Nodes pi = SHORTEST_PATH(aH->getNode(), target);  // l.6
+  NODES pi = SHORTEST_PATH(aH->getNode(), target);  // l.6
 
   RES attempt = FEASIBLE(s, pi);  // l.16
 
@@ -213,7 +210,7 @@ RES PPS::PUSH(S* s) {
   return attempt;  // l.19
 }
 
-RES PPS::FEASIBLE(PIBT_Agent* c, Nodes &pi, PIBT_Agents &H, Nodes &T, bool swap) {
+RES PPS::FEASIBLE(PIBT_Agent* c, NODES &pi, AGENTS &H, NODES &T, bool swap) {
   if (pi.size() < 2) return RES::FAIL;  // l.1
   Node* v = pi[1];  // l.2
 
@@ -231,7 +228,7 @@ RES PPS::FEASIBLE(PIBT_Agent* c, Nodes &pi, PIBT_Agents &H, Nodes &T, bool swap)
 
   auto itrA = std::find_if(A.begin(), A.end(),
                            [v] (PIBT_Agent* a) { return a->getNode() == v; });
-  Nodes pi_one, pi_two;
+  NODES pi_one, pi_two;
   PIBT_Agent* a = nullptr;
 
   if (itrA != A.end() && swap == false) {  // l.10
@@ -266,7 +263,7 @@ RES PPS::FEASIBLE(PIBT_Agent* c, Nodes &pi, PIBT_Agents &H, Nodes &T, bool swap)
   return PUSH(a, H, T, swap);  // l.24, recursive push
 }
 
-RES PPS::FEASIBLE(S* s, Nodes &pi) {
+RES PPS::FEASIBLE(S* s, NODES &pi) {
   if (pi.size() < 2) return RES::FAIL;  // l.1
   Node* v = pi[1];  // l.2
 
@@ -288,7 +285,7 @@ RES PPS::FEASIBLE(S* s, Nodes &pi) {
   }
 
   a = *itrA;
-  PIBT_Agents H = { s->agents[0], s->agents[1] };
+  AGENTS H = { s->agents[0], s->agents[1] };
   return PUSH(a, H, true);  // l.24, recursive push
 }
 
@@ -326,7 +323,7 @@ CHECK PPS::CHECK_SWAPER(S* s) {
 
   PIBT_Agent* aH = s->agents[0];  // center
   PIBT_Agent* aL = s->agents[1];
-  Nodes neighbor = G->neighbor(aH->getNode());
+  NODES neighbor = G->neighbor(aH->getNode());
   bool aL2aH = inArray(aL->getNode(), neighbor);
 
   bool aE2aH = true;
@@ -335,8 +332,8 @@ CHECK PPS::CHECK_SWAPER(S* s) {
     aE2aH = inArray(aE->getNode(), neighbor);
   }
 
-  Nodes piH = SHORTEST_PATH(aH->getNode(), aH->getGoal());
-  Nodes piL = SHORTEST_PATH(aL->getNode(), aL->getGoal());
+  NODES piH = SHORTEST_PATH(aH->getNode(), aH->getGoal());
+  NODES piL = SHORTEST_PATH(aL->getNode(), aL->getGoal());
   bool depend = DEPEND(piH, piL) || DEPEND(piL, piH);
 
   if (aL2aH && aE2aH && depend) return CHECK::VALID;
@@ -353,7 +350,7 @@ CHECK PPS::CHECK_GOAL(PIBT_Agent* a) {
 
 void PPS::ADD_DONE_SWAPERS(S* s) {
   doneSwapers.push_back(s);
-  PIBT_Agents agents = s->agents;
+  AGENTS agents = s->agents;
   if (agents.size() == 3) {
     PIBT_Agent* a3 = agents[2];
     isTmpGoals[a3->getId()] = false;
@@ -373,30 +370,30 @@ void PPS::ADD_DONE_SWAPERS(S* s) {
   }
 }
 
-Nodes PPS::SHORTEST_PATH(Node* s, Node* g) {
+NODES PPS::SHORTEST_PATH(Node* s, Node* g) {
   return G->getPath(s, g);
 }
 
-Nodes PPS::SHORTEST_PATH(Node* s, Node* g, Nodes prohibited) {
+NODES PPS::SHORTEST_PATH(Node* s, Node* g, NODES prohibited) {
   return G->getPath(s, g, prohibited);
 }
 
-Nodes PPS::SHORTEST_PATH(PIBT_Agent* c, Node* g) {
+NODES PPS::SHORTEST_PATH(PIBT_Agent* c, Node* g) {
   return G->getPath(c->getNode(), g);
 }
 
-Nodes PPS::SHORTEST_PATH(PIBT_Agent* c, Node* g, PIBT_Agents& H) {
+NODES PPS::SHORTEST_PATH(PIBT_Agent* c, Node* g, AGENTS& H) {
   if (H.empty()) return G->getPath(c->getNode(), g);
 
-  Nodes prohibited;
+  NODES prohibited;
   for (auto a : H) prohibited.push_back(a->getNode());
   return G->getPath(c->getNode(), g, prohibited);
 }
 
-Nodes PPS::SHORTEST_PATH(PIBT_Agent* c, Node* g, PIBT_Agents& H, Nodes& T) {
+NODES PPS::SHORTEST_PATH(PIBT_Agent* c, Node* g, AGENTS& H, NODES& T) {
   if (H.empty()) return G->getPath(c->getNode(), g, T);
 
-  Nodes prohibited = T;
+  NODES prohibited = T;
   for (auto a : H) prohibited.push_back(a->getNode());
   return G->getPath(c->getNode(), g, prohibited);
 }
@@ -514,7 +511,7 @@ RES PPS::FIND_NEW_VERTEX(S* s) {
 
   // highest swaper
   s->esv.erase(s->esv.begin());  // pop
-  PIBT_Agents agents;
+  AGENTS agents;
   PIBT_Agent* a0 = s->agents[0];
   PIBT_Agent* a1 = s->agents[1];
   Node* v = s->esv[0];
@@ -528,7 +525,7 @@ RES PPS::FIND_NEW_VERTEX(S* s) {
   return RES::SUCCESS;
 }
 
-void PPS::move(PIBT_Agent* a, Nodes &pi) {
+void PPS::move(PIBT_Agent* a, NODES &pi) {
   // error check
   if (pi.size() < 2) {
     std::cout << "error@PPS::move, pi does not enough nodes" << "\n";
@@ -538,7 +535,7 @@ void PPS::move(PIBT_Agent* a, Nodes &pi) {
   a->setNode(pi[1]);
 }
 
-void PPS::move(S* s, Nodes &pi) {
+void PPS::move(S* s, NODES &pi) {
   // error check
   if (s->phase != SWAPPHASE::GO_TARGET &&
       s->phase != SWAPPHASE::CLEARING) {
@@ -592,7 +589,7 @@ void PPS::SWAP_PRIMITIVES(S* s) {
   M.push_back(aL);
 }
 
-bool PPS::DEPEND(Nodes piA, Nodes piB) {
+bool PPS::DEPEND(NODES piA, NODES piB) {
   // cond (a)
   if (inArray(piB[0], piA) && inArray(piB[piB.size()-1], piA)) return true;
   // cond (b)
@@ -601,8 +598,8 @@ bool PPS::DEPEND(Nodes piA, Nodes piB) {
   return false;
 }
 
-Nodes PPS::getSortedEsv(PIBT_Agent* c) {
-  Nodes lst = deg3nodes;
+NODES PPS::getSortedEsv(PIBT_Agent* c) {
+  NODES lst = deg3nodes;
   Graph* _G = G;
   Node* v = c->getNode();
   // actually, should use pathDist, but for fast implementation
@@ -619,9 +616,9 @@ void PPS::SETUP_SWAP(PIBT_Agent* c, PIBT_Agent* a) {
     std::exit(1);
   }
 
-  Nodes sorted_esv = getSortedEsv(c);  // l.14
+  NODES sorted_esv = getSortedEsv(c);  // l.14
   Node* v = sorted_esv[0];
-  PIBT_Agents agents;
+  AGENTS agents;
   if (pathDist(c->getNode(), v) <= pathDist(a->getNode(), v)) {
     agents = {c, a};
   } else {
@@ -638,6 +635,9 @@ void PPS::SETUP_SWAP(PIBT_Agent* c, PIBT_Agent* a) {
                  nullptr,  // evacL
                  {},       // area
                  SWAPPHASE::GO_TARGET };
+
+  // std::cout << s->id << ", " << agents[0]->getId() << ", " << agents[1]->getId()
+  //           << "\n";
   ++s_uuid;
 
   pusherToSwaper.push_back(c);
@@ -690,7 +690,7 @@ bool PPS::CLEAR(S* s) {
     std::exit(1);
   }
 
-  Nodes neighbor = G->neighbor(target);
+  NODES neighbor = G->neighbor(target);
   Node* evacH = nullptr;
   Node* evacL = nullptr;
   Node* aLPos = aL->getNode();
@@ -718,8 +718,8 @@ bool PPS::CLEAR(S* s) {
 
       PIBT_Agent* a = *std::find_if(A.begin(), A.end(),
                                [v](PIBT_Agent* a) { return a->getNode() == v; });
-      PIBT_Agents H = { aH, aL };
-      Nodes T = { evacH };
+      AGENTS H = { aH, aL };
+      NODES T = { evacH };
       RES attempt = PUSH(a, H, T, true);
 
       if (attempt != RES::SUCCESS) continue;
@@ -754,7 +754,7 @@ bool PPS::CLEAR(S* s) {
       }
 
       Node* a3target = nullptr;
-      Nodes evacHneighbor = G->neighbor(evacH);
+      NODES evacHneighbor = G->neighbor(evacH);
       for (auto u : evacHneighbor) {
         if (u == target) continue;
         if (u == a3->getNode()) continue;
@@ -763,7 +763,7 @@ bool PPS::CLEAR(S* s) {
       }
       if (!a3target) continue;
 
-      Nodes pi = SHORTEST_PATH(evacH, a3target, { aLPos });
+      NODES pi = SHORTEST_PATH(evacH, a3target, { aLPos });
       if (pi.size() < 2) continue;  // there is no path
 
       // temporary change goal node
@@ -775,7 +775,7 @@ bool PPS::CLEAR(S* s) {
         // temporary change goal node
         aL->setGoal(u);
 
-        Nodes prohibited = { a3target, target, evacH };
+        NODES prohibited = { a3target, target, evacH };
         RES attempt = PUSH(aL, prohibited, true);
 
         if (attempt != RES::SUCCESS) continue;
@@ -840,7 +840,7 @@ bool PPS::CLEAR(S* s) {
   return false;
 }
 
-bool PPS::reserved(Node* v, PIBT_Agents &M) {
+bool PPS::reserved(Node* v, AGENTS &M) {
   return std::any_of(M.begin(), M.end(),
                      [v](PIBT_Agent* a) { return a->getNode() == v; });
 }
@@ -898,11 +898,11 @@ struct VD {
   int d;    // distance
 };
 
-Nodes PPS::CLOSEST_EMPTY_VERTICLES(PIBT_Agent* c) {
-  Nodes empties;
-  Nodes occupied;
-  Nodes Y;
-  Nodes C;
+NODES PPS::CLOSEST_EMPTY_VERTICLES(PIBT_Agent* c) {
+  NODES empties;
+  NODES occupied;
+  NODES Y;
+  NODES C;
 
   // create occupied lists
   for (auto a : A) occupied.push_back(a->getNode());

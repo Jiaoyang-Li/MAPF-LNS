@@ -13,25 +13,27 @@ protected:
   void init();
   void allocate();
 
-  virtual void updatePriority();
-  Nodes createCandidates(PIBT_Agent* a, Nodes CLOSE_NODE);
-  Nodes createCandidates(PIBT_Agent* a, Nodes CLOSE_NODE, Node* tmp);
+  void updatePriority();
+  std::vector<Node*> createCandidates(PIBT_Agent* a, std::vector<Node*> CLOSE_NODE);
+  std::vector<Node*> createCandidates(PIBT_Agent* a,
+                                      std::vector<Node*> CLOSE_NODE,
+                                      Node* tmp);
   bool priorityInheritance(PIBT_Agent* a,
-                           Nodes& CLOSE_NODE,
-                           PIBT_Agents& OPEN_AGENT,
+                           std::vector<Node*>& CLOSE_NODE,
+                           std::vector<PIBT_Agent*>& OPEN_AGENT,
                            std::vector<float>& PL);
   bool priorityInheritance(PIBT_Agent* a,
                            PIBT_Agent* aFrom,
-                           Nodes& CLOSE_NODE,
-                           PIBT_Agents& OPEN_AGENT,
+                           std::vector<Node*>& CLOSE_NODE,
+                           std::vector<PIBT_Agent*>& OPEN_AGENT,
                            std::vector<float>& PL);
-  virtual bool priorityInheritance(PIBT_Agent* a,
-                                   Nodes C,
-                                   Nodes& CLOSE_NODE,
-                                   PIBT_Agents& OPEN_AGENT,
-                                   std::vector<float>& PL);
-  virtual Node* chooseNode(PIBT_Agent* a, Nodes C);
-  void updateC(Nodes& C, Node* target, Nodes CLOSE_NODE);
+  bool priorityInheritance(PIBT_Agent* a,
+                           std::vector<Node*> C,
+                           std::vector<Node*>& CLOSE_NODE,
+                           std::vector<PIBT_Agent*>& OPEN_AGENT,
+                           std::vector<float>& PL);
+  Node* chooseNode(PIBT_Agent* a, std::vector<Node*> C);
+  void updateC(std::vector<Node*>& C, Node* target, std::vector<Node*> CLOSE_NODE);
 
   float getDensity(PIBT_Agent* a);  // density can be used as effective prioritization
 
@@ -41,7 +43,7 @@ public:
   ~PIBT();
 
   bool solve();
-  virtual void update();
+  void update();
 
-  virtual std::string logStr();
+  std::string logStr();
 };

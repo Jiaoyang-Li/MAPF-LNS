@@ -44,13 +44,14 @@ void PIBT::init() {
 
 bool PIBT::solve() {
   solveStart();
+
   while (!P->isSolved()) {
     allocate();
     update();
     P->update();
-    if (P->getTimestep() >= P->getTimestepLimit()) {
-        break;
-    };
+      if (time_limit && ( (fsec)(std::chrono::system_clock::now() - startT)).count() > time_limit){
+          break;
+      }
   }
 
   solveEnd();
@@ -84,8 +85,8 @@ void PIBT::update() {
   std::vector<float> PL(priority.size());  // priority list
   std::copy(priority.begin(), priority.end(), PL.begin());
 
-  Nodes CLOSE_NODE;
-  PIBT_Agents OPEN_AGENT(A.size());
+  std::vector<Node*> CLOSE_NODE;
+  std::vector<PIBT_Agent*> OPEN_AGENT(A.size());
   std::copy(A.begin(), A.end(), OPEN_AGENT.begin());
 
   // choose one agent with the highest priority
@@ -123,7 +124,7 @@ float PIBT::getDensity(PIBT_Agent* a) {
   Node *v, *u;
   int d, tmp;
   v = a->getNode();
-  Nodes Ci, Cj;
+  std::vector<Node*> Ci, Cj;
   Ci = G->neighbor(v);
 
   for (auto b : A) {
@@ -148,26 +149,26 @@ float PIBT::getDensity(PIBT_Agent* a) {
 }
 
 bool PIBT::priorityInheritance(PIBT_Agent* a,
-                               Nodes& CLOSE_NODE,
-                               PIBT_Agents& OPEN_AGENT,
+                               std::vector<Node*>& CLOSE_NODE,
+                               std::vector<PIBT_Agent*>& OPEN_AGENT,
                                std::vector<float>& PL) {
-  Nodes C = createCandidates(a, CLOSE_NODE);
+  std::vector<Node*> C = createCandidates(a, CLOSE_NODE);
   return priorityInheritance(a, C, CLOSE_NODE, OPEN_AGENT, PL);
 }
 
 bool PIBT::priorityInheritance(PIBT_Agent* a,
                                PIBT_Agent* aFrom,
-                               Nodes& CLOSE_NODE,
-                               PIBT_Agents& OPEN_AGENT,
+                               std::vector<Node*>& CLOSE_NODE,
+                               std::vector<PIBT_Agent*>& OPEN_AGENT,
                                std::vector<float>& PL) {
-  Nodes C = createCandidates(a, CLOSE_NODE, aFrom->getNode());
+  std::vector<Node*> C = createCandidates(a, CLOSE_NODE, aFrom->getNode());
   return priorityInheritance(a, C, CLOSE_NODE, OPEN_AGENT, PL);
 }
 
 bool PIBT::priorityInheritance(PIBT_Agent* a,
-                               Nodes C,
-                               Nodes& CLOSE_NODE,
-                               PIBT_Agents& OPEN_AGENT,
+                               std::vector<Node*> C,
+                               std::vector<Node*>& CLOSE_NODE,
+                               std::vector<PIBT_Agent*>& OPEN_AGENT,
                                std::vector<float>& PL)
 {
   // remove agent from OPEN_AGENT, Priority List
@@ -212,8 +213,9 @@ bool PIBT::priorityInheritance(PIBT_Agent* a,
   return false;
 }
 
-Nodes PIBT::createCandidates(PIBT_Agent* a, Nodes CLOSE_NODE) {
-  Nodes C;
+std::vector<Node*> PIBT::createCandidates(PIBT_Agent* a,
+                                          std::vector<Node*> CLOSE_NODE) {
+  std::vector<Node*> C;
   for (auto v : G->neighbor(a->getNode())) {
     if (!inArray(v, CLOSE_NODE)) C.push_back(v);
   }
@@ -221,14 +223,16 @@ Nodes PIBT::createCandidates(PIBT_Agent* a, Nodes CLOSE_NODE) {
   return C;
 }
 
-Nodes PIBT::createCandidates(PIBT_Agent* a, Nodes CLOSE_NODE, Node* tmp) {
+std::vector<Node*> PIBT::createCandidates(PIBT_Agent* a,
+                                          std::vector<Node*> CLOSE_NODE,
+                                          Node* tmp) {
   CLOSE_NODE.push_back(tmp);
-  Nodes C = createCandidates(a, CLOSE_NODE);
+  std::vector<Node*> C = createCandidates(a, CLOSE_NODE);
   CLOSE_NODE.erase(CLOSE_NODE.end() - 1);
   return C;
 }
 
-Node* PIBT::chooseNode(PIBT_Agent* a, Nodes C) {
+Node* PIBT::chooseNode(PIBT_Agent* a, std::vector<Node*> C) {
   if (C.empty()) {
     std::cout << "error@PIBT::chooseNode, C is empty" << "\n";
     std::exit(1);
@@ -245,13 +249,13 @@ Node* PIBT::chooseNode(PIBT_Agent* a, Nodes C) {
     }
   }
 
-  Nodes cs;
+  std::vector<Node*> cs;
   int minCost = 10000;
   int cost;
   Node* g = a->getGoal();
 
   // fast implementation
-  Nodes p = G->getPath(a->getNode(), g);
+  std::vector<Node*> p = G->getPath(a->getNode(), g);
   if (p.size() > 1 && inArray(p[1], C)) return p[1];
 
   for (auto v : C) {
@@ -269,7 +273,7 @@ Node* PIBT::chooseNode(PIBT_Agent* a, Nodes C) {
 
   // tie break
   bool contained;
-  for (auto v : cs) {  // avoid tabu list
+  for (auto v : cs) {
     contained = std::any_of(A.begin(), A.end(),
                             [v](PIBT_Agent* b){ return b->getNode() == v; });
     if (!contained) return v;
@@ -278,7 +282,8 @@ Node* PIBT::chooseNode(PIBT_Agent* a, Nodes C) {
   return cs[0];
 }
 
-void PIBT::updateC(Nodes& C, Node* target, Nodes CLOSE_NODE) {
+void PIBT::updateC(std::vector<Node*>& C, Node* target,
+                   std::vector<Node*> CLOSE_NODE) {
   for (auto v : CLOSE_NODE) {
     auto itr2 = std::find_if(C.begin(), C.end(),
                              [v] (Node* u) { return v == u; });

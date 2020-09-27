@@ -60,15 +60,6 @@ void Task::setEndTime(int t) {
   endTime = t;
 }
 
-Node* Task::getNext(Node* g) {
-  auto itr = G_OPEN.begin();
-  while (*itr != g || itr != G_OPEN.end()) ++itr;
-  if (itr == G_OPEN.end()) return nullptr;
-  ++itr;
-  if (itr == G_OPEN.end()) return nullptr;
-  return *itr;
-}
-
 std::string Task::logStr() {
   std::string str;
   str += "[task] ";
@@ -78,6 +69,5 @@ std::string Task::logStr() {
   str += ",service time:" + std::to_string(endTime - startTime);
   str += ",nodes:";
   for (auto v : G_CLOSE) str += std::to_string(v->getId()) + ",";
-  str += "\n";
   return str;
 }

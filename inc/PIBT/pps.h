@@ -21,33 +21,33 @@ enum SWAPPHASE { GO_TARGET,
 
 struct S {
   int id;
-  PIBT_Agents agents;  // priority : high priority, low priority
+  AGENTS agents;  // priority : high priority, low priority
   Node* lowOriginalNode;  // [low] original pos, [high] goal pos
-  Nodes esv;  // swap node candidates
+  NODES esv;  // swap node candidates
   Node* target;  // swap node, deg(target) >= 3
   Node* origin;  // low pos when swap starts
   Node* evacH;  // [high] evacuation node
   Node* evacL;  // [low]  evacuation node
-  Nodes area;   // swap area, using case 3
+  NODES area;   // swap area, using case 3
   SWAPPHASE phase;  // phase
 };
 
 class PPS : public Solver {
 private:
-  PIBT_Agents pushers;  // pushers
+  AGENTS pushers;  // pushers
   std::vector<S*> swapers;   // swapers
-  PIBT_Agents pusherToSwaper;  // tmp
-  PIBT_Agents swaperToPusher;  // tmp
+  AGENTS pusherToSwaper;  // tmp
+  AGENTS swaperToPusher;  // tmp
   std::vector<S*> doneSwapers;  // tmp
 
-  PIBT_Agents M;  // moved agents
-  PIBT_Agents U;  // goal agents
-  Nodes L;   // reserved nodes
+  AGENTS M;  // moved agents
+  AGENTS U;  // goal agents
+  NODES L;   // reserved nodes
   bool status;  // continue or not
 
-  Nodes goals;  // final goal
+  NODES goals;  // final goal
   std::vector<bool> isTmpGoals;  // has temp goal
-  Nodes deg3nodes;
+  NODES deg3nodes;
 
   static int s_uuid;
 
@@ -56,21 +56,21 @@ private:
   RES SWAP(S* s);
 
   RES PUSH(PIBT_Agent* c, bool swap);
-  RES PUSH(PIBT_Agent* c, Nodes &T, bool swap);
-  RES PUSH(PIBT_Agent* c, PIBT_Agents &H, bool swap);
-  RES PUSH(PIBT_Agent* c, PIBT_Agents &H, Nodes &T, bool swap);
+  RES PUSH(PIBT_Agent* c, NODES &T, bool swap);
+  RES PUSH(PIBT_Agent* c, AGENTS &H, bool swap);
+  RES PUSH(PIBT_Agent* c, AGENTS &H, NODES &T, bool swap);
   RES PUSH(S* s);
 
-  RES FEASIBLE(PIBT_Agent* c, Nodes &pi, PIBT_Agents& H, Nodes& T, bool swap);
-  RES FEASIBLE(S* s, Nodes &pi);
+  RES FEASIBLE(PIBT_Agent* c, NODES &pi, AGENTS& H, NODES& T, bool swap);
+  RES FEASIBLE(S* s, NODES &pi);
 
-  Nodes SHORTEST_PATH(Node* s, Node* g);
-  Nodes SHORTEST_PATH(PIBT_Agent* c, Node* g);
-  Nodes SHORTEST_PATH(PIBT_Agent* c, Node* g, PIBT_Agents& H);
-  Nodes SHORTEST_PATH(Node* s, Node* g, Nodes prohibited);
-  Nodes SHORTEST_PATH(PIBT_Agent* c, Node* g, PIBT_Agents& H, Nodes& T);
+  NODES SHORTEST_PATH(Node* s, Node* g);
+  NODES SHORTEST_PATH(PIBT_Agent* c, Node* g);
+  NODES SHORTEST_PATH(PIBT_Agent* c, Node* g, AGENTS& H);
+  NODES SHORTEST_PATH(Node* s, Node* g, NODES prohibited);
+  NODES SHORTEST_PATH(PIBT_Agent* c, Node* g, AGENTS& H, NODES& T);
 
-  bool DEPEND(Nodes piA, Nodes piB);
+  bool DEPEND(NODES piA, NODES piB);
 
   void SETUP_SWAP(PIBT_Agent* c, PIBT_Agent* a);
 
@@ -79,14 +79,14 @@ private:
   void SWAP_PRIMITIVES(S* s);
   void FINISH_SWAP(S* s);
 
-  void move(PIBT_Agent* a, Nodes &pi);
-  void move(S* s, Nodes &pi);
+  void move(PIBT_Agent* a, NODES &pi);
+  void move(S* s, NODES &pi);
 
-  bool reserved(Node* v, PIBT_Agents &M);
+  bool reserved(Node* v, AGENTS &M);
   bool isFree(Node* v);
   bool inS(PIBT_Agent* a);
   S* getS(PIBT_Agent* a);
-  Nodes getSortedEsv(PIBT_Agent* c);
+  NODES getSortedEsv(PIBT_Agent* c);
 
   CHECK CHECK_PRIORITY(S* s, PIBT_Agent* a);
   CHECK CHECK_PRIORITY(PIBT_Agent* c, PIBT_Agent* a);
@@ -99,7 +99,7 @@ private:
   CHECK CHECK_GOAL(PIBT_Agent* a);
 
   void ADD_DONE_SWAPERS(S* s);
-  Nodes CLOSEST_EMPTY_VERTICLES(PIBT_Agent* c);
+  NODES CLOSEST_EMPTY_VERTICLES(PIBT_Agent* c);
 
 public:
   PPS(Problem* _P);

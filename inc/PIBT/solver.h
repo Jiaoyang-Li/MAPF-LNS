@@ -8,7 +8,13 @@
 #include <unordered_map>
 #include <unordered_set>
 
-struct AN {
+typedef std::chrono::duration<float> fsec;
+
+using AGENTS = std::vector<PIBT_Agent*>;
+using NODES = std::vector<Node*>;
+using Paths = std::vector<std::vector<Node*>>;
+
+struct AN {  // for A* search
   Node* v;
   bool open;
   int t;
@@ -18,29 +24,30 @@ struct AN {
 
 class Solver {
 private:
-  double elapsedTime;
+  double elapsedTime;  // runtime
+
 
 protected:
   Problem* P;
   std::mt19937* MT;
 
-  PIBT_Agents A;
+  std::vector<PIBT_Agent*> A;
   Graph* G;
 
-  Eigen::MatrixXi dists;
+  Eigen::MatrixXi dists;  // path dist
 
   void init();
-  int getMaxLengthPaths(Paths& paths);
-  void formalizePath(Paths& paths);
+  int getMaxLengthPaths(Paths& paths);  // get max length within paths
+  void formalizePath(Paths& paths);  // formalize paths with different lengths
   int pathDist(Node* v, Node* u);
-  int pathDist(Node* s, Node* g, Nodes &prohibited);
-  std::vector<PIBT_Agents> findAgentBlock();
+  int pathDist(Node* s, Node* g, std::vector<Node*> &prohibited);  // with some prohibited nodes
   static std::string getKey(int t, Node* v);
 
   virtual void solveStart();
   virtual void solveEnd();
   std::chrono::system_clock::time_point startT;
   std::chrono::system_clock::time_point endT;
+  double time_limit = 0;
 
 public:
   Solver(Problem* _P);
@@ -48,8 +55,10 @@ public:
   ~Solver();
 
   void WarshallFloyd();
+  void setTimeLimit(double limit){this->time_limit = limit;};
 
-  virtual bool solve() { return false; };
+
+    virtual bool solve() { return false; };
   double getElapsed() { return elapsedTime; };
 
   virtual std::string logStr();

@@ -5,13 +5,13 @@
 #include <utility>
 
 //pibt related
-#include "simplegrid.h"
+#include "dao.h"
 #include "pibt_agent.h"
 #include "problem.h"
 #include "mapf.h"
+#include "solver.h"
 #include "pibt.h"
 #include "pps.h"
-#include "winpibt.h"
 using namespace std::chrono;
 typedef std::chrono::high_resolution_clock Time;
 typedef std::chrono::duration<float> fsec;
@@ -106,7 +106,7 @@ private:
     PIBTPPS_option pipp_option;
 
     MAPF preparePIBTProblem(vector<int> shuffled_agents);
-    void updatePIBTResult(const PIBT_Agents& A,vector<int> shuffled_agents);
+    void updatePIBTResult(const AGENTS& A,vector<int> shuffled_agents);
 
     void updateDestroyHeuristicbyALNS();
 

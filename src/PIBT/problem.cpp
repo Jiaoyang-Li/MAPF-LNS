@@ -11,28 +11,28 @@
 
 
 Problem::Problem(Graph* _G,
-                 PIBT_Agents _A,
+                 std::vector<PIBT_Agent*> _A,
                  std::vector<Task*> _T) : G(_G), A(_A), T_OPEN(_T){
   std::random_device seed_gen;
   MT = new std::mt19937(seed_gen());
   init();
 }
 
-Problem::Problem(Graph* _G, PIBT_Agents _A) : G(_G), A(_A) {
+Problem::Problem(Graph* _G, std::vector<PIBT_Agent*> _A) : G(_G), A(_A) {
   std::random_device seed_gen;
   MT = new std::mt19937(seed_gen());
   init();
 }
 
 Problem::Problem(Graph* _G,
-                 PIBT_Agents _A,
+                 std::vector<PIBT_Agent*> _A,
                  std::vector<Task*> _T,
                  std::mt19937* _MT) : G(_G), A(_A), T_OPEN(_T), MT(_MT) {
   init();
 }
 
 Problem::Problem(Graph* _G,
-                 PIBT_Agents _A,
+                 std::vector<PIBT_Agent*> _A,
                  std::mt19937* _MT) : G(_G), A(_A), MT(_MT) {
   init();
 }
@@ -54,5 +54,5 @@ void Problem::assign(Task* tau) {
 }
 
 std::string Problem::logStr() {
-  return "[problem] timesteplimit:" + std::to_string(timesteplimit) + "\n";
+  return "";
 }

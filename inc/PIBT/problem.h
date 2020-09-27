@@ -3,17 +3,12 @@
 #include "pibt_agent.h"
 #include "task.h"
 
-using PIBT_Agents = std::vector<PIBT_Agent*>;
-// defined in Graph.h
-// using Nodes = std::vector<Node*>;
-// using Paths = std::vector<Nodes>;
 
 class Problem {
 protected:
   int timestep;
-  int timesteplimit;
   Graph *G;
-  PIBT_Agents A;
+  std::vector<PIBT_Agent*> A;
   std::vector<Task*> T_OPEN;   // open tasks
   std::vector<Task*> T_CLOSE;  // close tasks
 
@@ -22,10 +17,10 @@ protected:
   void init();
 
 public:
-  Problem(Graph* _G, PIBT_Agents _A, std::vector<Task*> _T);
-  Problem(Graph* _G, PIBT_Agents _A);
-  Problem(Graph* _G, PIBT_Agents _A, std::vector<Task*> _T, std::mt19937* _MT);
-  Problem(Graph* _G, PIBT_Agents _A, std::mt19937* _MT);
+  Problem(Graph* _G, std::vector<PIBT_Agent*> _A, std::vector<Task*> _T);
+  Problem(Graph* _G, std::vector<PIBT_Agent*> _A);
+  Problem(Graph* _G, std::vector<PIBT_Agent*> _A, std::vector<Task*> _T, std::mt19937* _MT);
+  Problem(Graph* _G, std::vector<PIBT_Agent*> _A, std::mt19937* _MT);
 
   virtual ~Problem();
 
@@ -33,14 +28,11 @@ public:
   virtual void update() {}
   virtual bool allocated() { return false; }  // whether tasks are assigned beforehand?
 
-  Graph* getG() { return G; }
-  PIBT_Agents getA() { return A; }
-  std::vector<Task*> getT() { return T_OPEN; }
+  Graph* getG() { return G; }  // graph
+  std::vector<PIBT_Agent*> getA() { return A; }  // agents
+  std::vector<Task*> getT() { return T_OPEN; }  // tasks (open)
   int getTerminationTime() { return timestep; }
   int getTimestep() { return timestep; }
-
-  int getTimestepLimit() { return timesteplimit; }
-  void setTimestepLimit(int _t) { timesteplimit = _t; }
 
   void assign(Task* tau);
   virtual void setAutoAssignement(bool flg) {}
