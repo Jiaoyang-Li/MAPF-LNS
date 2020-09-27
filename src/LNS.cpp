@@ -331,35 +331,10 @@ bool LNS::runPP()
 }
 
 bool LNS::runPPS(){
-    auto shuffled_agents = neighbor.agents;
-    std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
-
-    MAPF P = preparePIBTProblem(shuffled_agents);
-    P.setTimestepLimit(pipp_option.timestepLimit);
-
-    // seed for solver
-    std::mt19937* MT_S = new std::mt19937(0);
-    PPS solver(&P,MT_S);
-//    solver.WarshallFloyd();
-    bool result = solver.solve();
-    if (result)
-        updatePIBTResult(P.getA(),shuffled_agents);
-    return result;
+  return false;
 }
 bool LNS::runPIBT(){
-    auto shuffled_agents = neighbor.agents;
-     std::random_shuffle(shuffled_agents.begin(), shuffled_agents.end());
-
-    MAPF P = preparePIBTProblem(shuffled_agents);
-    P.setTimestepLimit(pipp_option.timestepLimit);
-
-    // seed for solver
-    std::mt19937* MT_S = new std::mt19937(0);
-    PIBT solver(&P,MT_S);
-    bool result = solver.solve();
-    if (result)
-        updatePIBTResult(P.getA(),shuffled_agents);
-    return result;
+    return false;
 }
 
 bool LNS::runWinPIBT(){

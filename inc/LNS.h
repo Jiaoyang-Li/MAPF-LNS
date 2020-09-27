@@ -9,8 +9,6 @@
 #include "pibt_agent.h"
 #include "problem.h"
 #include "mapf.h"
-#include "pibt.h"
-#include "pps.h"
 #include "winpibt.h"
 using namespace std::chrono;
 typedef std::chrono::high_resolution_clock Time;

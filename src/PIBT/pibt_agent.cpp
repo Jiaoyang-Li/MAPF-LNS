@@ -1,7 +1,7 @@
 /*
  * agent.cpp
  *
- * Purpose: Agent
+ * Purpose: PIBT_Agent
  * Created by: Keisuke Okumura <okumura.k@coord.c.titech.ac.jp>
  */
 

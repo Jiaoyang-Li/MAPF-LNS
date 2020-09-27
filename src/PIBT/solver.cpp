@@ -138,6 +138,10 @@ std::string Solver::getKey(int t, Node* v) {
   return key;
 }
 
+std::string Solver::getKey(AN* n) {
+  return getKey(n->g, n->v);
+}
+
 std::string Solver::logStr() {
   std::string str;
 

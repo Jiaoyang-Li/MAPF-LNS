@@ -2,7 +2,7 @@
 #include <boost/tokenizer.hpp>
 #include "LNS.h"
 #include "AnytimeBCBS.h"
-#include "PIBT/pibt.h"
+#include "winpibt.h"
 
 
 /* Main function */
