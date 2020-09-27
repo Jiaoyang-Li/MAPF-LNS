@@ -98,7 +98,7 @@ void SimpleGrid::createNodes() {
         id = j * w + i;
         if (s == 'T' or s == '@') continue;
         Node* v = new Node(id);
-        v->setPos(i, j);
+        v->setPos(j, i);
         nodes.push_back(v);
       }
       ++j;
