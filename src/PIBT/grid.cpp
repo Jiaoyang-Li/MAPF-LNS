@@ -171,5 +171,5 @@ void Grid::initNodes() {
   Graph::initNodes();
   Graph::setNeighbor();
   adjMatrix.clear();
-  std::cout << "finish creating map" << "\n";
+  //std::cout << "finish creating map" << "\n";
 }
