@@ -8,6 +8,16 @@ More details can be found in our paper at AAMAS 2021 [1].
 
 The code requires the external libraries 
 BOOST (https://www.boost.org/) and Eigen (https://eigen.tuxfamily.org/). 
+An easy way to install the required libraries in Linux:
+- Install the Eigen library (used for linear algebra computing)
+    ```shell script
+    sudo apt install libeigen3-dev
+    ```
+- Install the boost library 
+    ```shell script
+    sudo apt install libboost-all-dev
+    ```
+    
 After you installed both libraries and downloaded the source code, 
 go into the directory of the source code and compile it with CMake: 
 ```
