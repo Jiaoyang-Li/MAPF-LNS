@@ -4,7 +4,7 @@ Anytime Multi-Agent Path Finding via Large Neighborhood Search
 
 
 MAPF-LNS is an effifent anytime algorithm for solving Multi-Agent Path Finding (MAPF). 
-More details can be found in our paper at AAMAS 2021 [1].
+More details can be found in our paper at IJCAI 2021 [1].
 
 The code requires the external libraries 
 BOOST (https://www.boost.org/) and Eigen (https://eigen.tuxfamily.org/). 
