@@ -8,7 +8,7 @@ More details can be found in our paper at IJCAI 2021 [1].
 
 The code requires the external libraries 
 BOOST (https://www.boost.org/) and Eigen (https://eigen.tuxfamily.org/). 
-An easy way to install the required libraries in Linux:    
+An easy way to install the required libraries on Ubuntu:    
 ```shell script
 sudo apt update
 ```
