@@ -9,6 +9,9 @@ More details can be found in our paper at IJCAI 2021 [1].
 The code requires the external libraries 
 BOOST (https://www.boost.org/) and Eigen (https://eigen.tuxfamily.org/). 
 An easy way to install the required libraries in Linux:
+    ```shell script
+    sudo apt update
+    ```
 - Install the Eigen library (used for linear algebra computing)
     ```shell script
     sudo apt install libeigen3-dev
