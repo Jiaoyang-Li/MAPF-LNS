@@ -24,7 +24,7 @@ sudo apt update
 After you installed both libraries and downloaded the source code, 
 go into the directory of the source code and compile it with CMake: 
 ```
-cmake .
+cmake -DCMAKE_BUILD_TYPE=RELEASE .
 make
 ```
 
