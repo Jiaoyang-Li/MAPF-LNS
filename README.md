@@ -1,5 +1,6 @@
 # MAPF-LNS
 ![test_ubuntu](https://github.com/Jiaoyang-Li/MAPF-LNS/actions/workflows/test_ubuntu.yml/badge.svg)
+![test_macos](https://github.com/Jiaoyang-Li/MAPF-LNS/actions/workflows/test_macos.yml/badge.svg)
 
 Anytime Multi-Agent Path Finding via Large Neighborhood Search
 
