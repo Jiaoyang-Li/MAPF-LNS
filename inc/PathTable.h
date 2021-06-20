@@ -24,6 +24,7 @@ public:
 class PathTableWC // with collisions
 {
 public:
+    bool ignore_following_collisions = true;
     int makespan = 0;
     vector< vector< list<int> > > table; // this stores the paths, the value is the id of the agent
     vector<int> goals; // this stores the goal locatons of the paths: key is the location, while value is the timestep when the agent reaches the goal

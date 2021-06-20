@@ -85,7 +85,7 @@ public:
     uint64_t num_runs = 0;
 
     int num_collisions = -1;
-	double runtime_build_CT = 0; // runtimr of building constraint table
+	double runtime_build_CT = 0; // runtime of building constraint table
 	double runtime_build_CAT = 0; // runtime of building conflict avoidance table
 
 	int start_location;
@@ -103,7 +103,8 @@ public:
 		const vector<Path*>& paths, int agent, int lower_bound) = 0;
 	virtual pair<Path, int> findSuboptimalPath(const HLNode& node, const ConstraintTable& initial_constraints,
 		const vector<Path*>& paths, int agent, int lowerbound, double w) = 0;  // return the path and the lowerbound
-    virtual Path findPath(const ConstraintTable& constraint_table) = 0;  // return the path
+    virtual bool findPath(Path & path, const ConstraintTable& constraint_table) = 0;  // return the path
+    virtual bool findPath(Path & path, const ConstraintTable& constraint_table, int location, int timestep) = 0;  // return the path
     void findMinimumSetofColldingTargets(vector<int>& goal_table,set<int>& A_target);
     virtual int getTravelTime(int start, int end, const ConstraintTable& constraint_table, int upper_bound) = 0;
 	virtual string getName() const = 0;

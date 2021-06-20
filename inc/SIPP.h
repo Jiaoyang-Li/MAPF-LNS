@@ -74,7 +74,8 @@ public:
 		const vector<Path*>& paths, int agent, int lowerbound);
 	pair<Path, int> findSuboptimalPath(const HLNode& node, const ConstraintTable& initial_constraints,
 		const vector<Path*>& paths, int agent, int lowerbound, double w);  // return the path and the lowerbound
-    Path findPath(const ConstraintTable& constraint_table); // return A path that minimizes collisions, breaking ties by cost
+    bool findPath(Path & path, const ConstraintTable& constraint_table); // return A path that minimizes collisions, breaking ties by cost
+    bool findPath(Path & path, const ConstraintTable& constraint_table, int location, int timestep);
     int getTravelTime(int start, int end, const ConstraintTable& constraint_table, int upper_bound);
 
 	string getName() const { return "SIPP"; }

@@ -16,7 +16,6 @@ LNS::LNS(const Instance& instance, double time_limit, const string & init_algo_n
     {
         ALNS = true;
         destroy_weights.assign(DESTORY_COUNT, 1);
-        decay_factor = 0.01;
         reaction_factor = 0.01;
     }
     else if (destory_name == "RandomWalk")
@@ -57,9 +56,8 @@ bool LNS::run()
     {
         if (use_init_lns)
         {
-            init_lns = new InitLNS(instance, agents, time_limit - initial_solution_runtime,
-                    replan_algo_name,init_destory_name, neighbor_size, screen);
-            succ = init_lns->run();
+            init_lns = new InitLNS(instance, agents, replan_algo_name,init_destory_name, neighbor_size, screen);
+            succ = init_lns->run(time_limit - initial_solution_runtime);
             if (succ) // accept new paths
             {
                 path_table.reset();
@@ -159,13 +157,9 @@ bool LNS::run()
 
         if (ALNS) // update destroy heuristics
         {
-            if (neighbor.old_sum_of_costs > neighbor.sum_of_costs )
-                destroy_weights[selected_neighbor] =
-                        reaction_factor * (neighbor.old_sum_of_costs - neighbor.sum_of_costs) / neighbor.agents.size()
-                        + (1 - reaction_factor) * destroy_weights[selected_neighbor];
-            else
-                destroy_weights[selected_neighbor] =
-                        (1 - decay_factor) * destroy_weights[selected_neighbor];
+            destroy_weights[selected_neighbor] =
+                    reaction_factor * max(0, neighbor.old_sum_of_costs - neighbor.sum_of_costs) / neighbor.agents.size()
+                    + (1 - reaction_factor) * destroy_weights[selected_neighbor];
         }
         runtime = ((fsec)(Time::now() - start_time)).count();
         sum_of_costs += neighbor.sum_of_costs - neighbor.old_sum_of_costs;
@@ -376,7 +370,7 @@ bool LNS::runPP()
             cout << "Remaining agents = " << remaining_agents <<
                  ", remaining time = " << T - ((fsec)(Time::now() - time)).count() << " seconds. " << endl
                  << "Agent " << agents[id].id << endl;
-        agents[id].path = agents[id].path_planner->findPath(constraint_table);
+        agents[id].path_planner->findPath(agents[id].path, constraint_table);
         if (agents[id].path.empty()) break;
         neighbor.sum_of_costs += (int)agents[id].path.size() - 1;
         if (neighbor.sum_of_costs >= neighbor.old_sum_of_costs)

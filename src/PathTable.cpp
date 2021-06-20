@@ -185,7 +185,7 @@ int PathTableWC::getNumOfCollisions(int from, int to, int to_time) const
     {
         if ((int)table[to].size() > to_time)
             rst += (int)table[to][to_time].size();  // vertex conflict
-        if (from != to && table[to].size() >= to_time && table[from].size() > to_time)
+        if (ignore_following_collisions and from != to && table[to].size() >= to_time && table[from].size() > to_time)
         {
             for (auto a1 : table[to][to_time - 1])
             {
@@ -196,6 +196,10 @@ int PathTableWC::getNumOfCollisions(int from, int to, int to_time) const
                 }
             }
         }
+        if (!ignore_following_collisions and (int)table[to].size() >= to_time)
+            rst += (int)table[to][to_time - 1].size();  // following conflict
+        if (!ignore_following_collisions and (int)table[to].size() > to_time + 1)
+            rst += (int)table[to][to_time + 1].size();  // following conflict
     }
     if (!goals.empty())
     {
@@ -210,7 +214,7 @@ bool PathTableWC::hasCollisions(int from, int to, int to_time) const
     {
         if ((int)table[to].size() > to_time and !table[to][to_time].empty())
             return true; // vertex conflict
-        if (from != to && table[to].size() >= to_time && table[from].size() > to_time)
+        if (ignore_following_collisions and from != to && table[to].size() >= to_time && table[from].size() > to_time)
         {
             for (auto a1 : table[to][to_time - 1])
             {
@@ -221,6 +225,12 @@ bool PathTableWC::hasCollisions(int from, int to, int to_time) const
                 }
             }
         }
+        if (!ignore_following_collisions and from != to and
+            (int)table[to].size() >= to_time and !table[to][to_time - 1].empty())
+            return true;  // following conflict
+        if (!ignore_following_collisions and from != to and
+            (int)table[to].size() > to_time + 1 and !table[to][to_time + 1].empty())
+            return true;  // following conflict
     }
     if (!goals.empty())
     {

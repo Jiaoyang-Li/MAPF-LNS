@@ -254,7 +254,8 @@ bool PBS::planPath(int agent, PBSNode& node, const set<int> & higher_agents, con
 
     // find a path
     t = clock();
-    Path new_path = search_engines[agent]->findPath(constraint_table);
+    Path new_path;
+    search_engines[agent]->findPath(new_path, constraint_table);
     for (auto a : lower_agents)
     {
         if (a < 0)

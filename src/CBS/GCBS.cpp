@@ -195,7 +195,8 @@ bool GCBS::findPathForSingleAgent(GCBSNode* node, int agent)
 
     // find a path
     t = clock();
-    Path new_path = search_engines[agent]->findPath(constraint_table);
+    Path new_path;
+    search_engines[agent]->findPath(new_path, constraint_table);
     runtime_path_finding += (double)(clock() - t) / CLOCKS_PER_SEC;
     if (screen > 1)
         cout << "\t\t\tRuntime of single-agent search = " << (double)(clock() - t) / CLOCKS_PER_SEC <<

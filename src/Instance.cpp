@@ -546,7 +546,7 @@ bool Instance::validateSolution(const vector<Path*>& paths, int sum_of_costs, in
              " is different from that of the solution " << sum << endl;
         exit(-1);
     }
-    // check for colliions
+    // check for collisions
     int collisions = 0;
     for (auto i = 0; i < start_locations.size(); i++)
     {
@@ -570,12 +570,28 @@ bool Instance::validateSolution(const vector<Path*>& paths, int sum_of_costs, in
                     found_collision = true;
                     break;
                 }
-                else if (paths[a1]->at(t).location == paths[a2]->at(t-1).location &&
+                else if (ignore_following_collisions and
+                        paths[a1]->at(t).location == paths[a2]->at(t-1).location and
                         paths[a1]->at(t-1).location == paths[a2]->at(t).location) // edge conflict
                 {
                     if (num_of_colliding_pairs == 0)
                     {
                         cerr << "Find an edge conflict between agents " << a1 << " and " << a2 <<
+                             " at edge (" << paths[a1]->at(t-1).location << "," << paths[a1]->at(t).location <<
+                             ") at timestep " << t << endl;
+                        exit(-1);
+                    }
+                    collisions++;
+                    found_collision = true;
+                    break;
+                }
+                else if (!ignore_following_collisions and
+                    (paths[a1]->at(t).location == paths[a2]->at(t-1).location or
+                     paths[a1]->at(t-1).location == paths[a2]->at(t).location)) // following conflict
+                {
+                    if (num_of_colliding_pairs == 0)
+                    {
+                        cerr << "Find a following conflict between agents " << a1 << " and " << a2 <<
                              " at edge (" << paths[a1]->at(t-1).location << "," << paths[a1]->at(t).location <<
                              ") at timestep " << t << endl;
                         exit(-1);
@@ -615,3 +631,5 @@ bool Instance::validateSolution(const vector<Path*>& paths, int sum_of_costs, in
     cout << "Done!" << endl;
     return true;
 }
+
+

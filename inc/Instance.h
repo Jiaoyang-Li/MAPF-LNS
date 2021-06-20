@@ -9,7 +9,7 @@ public:
 	int num_of_cols;
 	int num_of_rows;
 	int map_size;
-
+    bool ignore_following_collisions = true;
 	// enum valid_moves_t { NORTH, EAST, SOUTH, WEST, WAIT_MOVE, MOVE_COUNT };  // MOVE_COUNT is the enum's size
 
 	Instance()=default;

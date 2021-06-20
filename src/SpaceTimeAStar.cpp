@@ -1,19 +1,20 @@
 #include "SpaceTimeAStar.h"
 
 
-void SpaceTimeAStar::updatePath(const LLNode* goal, vector<PathEntry> &path)
+void SpaceTimeAStar::updatePath(const LLNode* goal, Path &path)
 {
     num_collisions = goal->num_of_conflicts;
     const LLNode* curr = goal;
     if (curr->is_goal)
         curr = curr->parent;
-	path.reserve(curr->g_val + 1);
+    int timestep = curr->g_val + max((int)path.size() - 1, 0);
+    path.resize(timestep + 1);
 	while (curr != nullptr) 
 	{
-		path.emplace_back(curr->location);
+		path[timestep].location = curr->location;
 		curr = curr->parent;
+		timestep--;
 	}
-    std::reverse(path.begin(),path.end());
 }
 
 
@@ -25,20 +26,25 @@ Path SpaceTimeAStar::findOptimalPath(const HLNode& node, const ConstraintTable& 
 
 // find path by time-space A* search
 // Returns a path that minimizes the collisions with the paths in the path table, breaking ties by the length
-Path SpaceTimeAStar::findPath(const ConstraintTable& constraint_table)
+bool SpaceTimeAStar::findPath(Path & path, const ConstraintTable& constraint_table)
+{
+    path.clear();
+    return findPath(path, constraint_table, start_location, 0);
+}
+bool SpaceTimeAStar::findPath(Path & path, const ConstraintTable& constraint_table, int location, int timestep)
 {
     reset();
-    Path path;
-    if (constraint_table.constrained(start_location, 0))
+    if (constraint_table.constrained(location, timestep))
     {
-        return path;
+        return false;
     }
     auto holding_time = constraint_table.getHoldingTime(goal_location, constraint_table.length_min); // the earliest timestep that the agent can hold its goal location. The length_min is considered here.
     auto static_timestep = constraint_table.getMaxTimestep() + 1; // everything is static after this timestep
     auto last_target_collision_time = constraint_table.getLastCollisionTimestep(goal_location);
     // generate start and add it to the OPEN & FOCAL list
-    auto h = max(max(my_heuristic[start_location], holding_time), last_target_collision_time + 1);
-    auto start = new AStarNode(start_location, 0, h, nullptr, 0, 0);
+    auto h = max(max(my_heuristic[location], holding_time), last_target_collision_time + 1);
+    auto collisions = constraint_table.getNumOfConflictsForStep(location, location, timestep);
+    auto start = new AStarNode(location, 0, h, nullptr, timestep, collisions);
     num_generated++;
     start->in_openlist = true;
     start->focal_handle = focal_list.push(start); // we only use focal list; no open list is used
@@ -171,7 +177,7 @@ Path SpaceTimeAStar::findPath(const ConstraintTable& constraint_table)
     }  // end while loop
 
     releaseNodes();
-    return path;
+    return (!path.empty() and path.back().location == goal_location);
 }
 
 // find path by time-space A* search

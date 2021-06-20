@@ -19,29 +19,29 @@ void SIPP::updatePath(const LLNode* goal, vector<PathEntry> &path)
 		path[curr->timestep].location = curr->location; // move to curr location
 		curr = prev;
 	}
-	assert(curr->timestep == 0);
-	path[0].location = curr->location;
+	path[curr->timestep].location = curr->location;
 }
 
 
 // find path by A*
 // Returns a path that minimizes the collisions with the paths in the path table, breaking ties by the length
-Path SIPP::findPath(const ConstraintTable& constraint_table)
+bool SIPP::findPath(Path & path, const ConstraintTable& constraint_table)
+{
+    path.clear();
+    return findPath(path, constraint_table, start_location, 0);
+}
+bool SIPP::findPath(Path & path, const ConstraintTable& constraint_table, int location, int timestep)
 {
     reset();
-    //Path path = findNoCollisionPath(constraint_table);
-    //if (!path.empty())
-    //    return path;
     ReservationTable reservation_table(constraint_table, goal_location);
-    Path path;
-    Interval interval = reservation_table.get_first_safe_interval(start_location);
-    if (get<0>(interval) > 0)
-        return path;
+    Interval interval = reservation_table.getSafeInterval(location, timestep);
+    if (get<0>(interval) < 0)
+        return false;
     auto holding_time = constraint_table.getHoldingTime(goal_location, constraint_table.length_min);
     auto last_target_collision_time = constraint_table.getLastCollisionTimestep(goal_location);
     // generate start and add it to the OPEN & FOCAL list
-    auto h = max(max(my_heuristic[start_location], holding_time), last_target_collision_time + 1);
-    auto start = new SIPPNode(start_location, 0, h, nullptr, 0, get<1>(interval), get<1>(interval),
+    auto h = max(max(my_heuristic[location], holding_time), last_target_collision_time + 1);
+    auto start = new SIPPNode(location, 0, h, nullptr, timestep, get<1>(interval), get<1>(interval),
                                 get<2>(interval), get<2>(interval));
     pushNodeToFocal(start);
 
@@ -130,7 +130,7 @@ Path SIPP::findPath(const ConstraintTable& constraint_table)
     //    printSearchTree();
     //}
     releaseNodes();
-    return path;
+    return (!path.empty() and path.back().location == goal_location);
 }
 Path SIPP::findOptimalPath(const HLNode& node, const ConstraintTable& initial_constraints,
 	const vector<Path*>& paths, int agent, int lowerbound)
@@ -163,8 +163,8 @@ pair<Path, int> SIPP::findSuboptimalPath(const HLNode& node, const ConstraintTab
     Path path;
 	num_expanded = 0;
 	num_generated = 0;
-	Interval interval = reservation_table.get_first_safe_interval(start_location);
-	if (get<0>(interval) > 0)
+	Interval interval = reservation_table.getSafeInterval(start_location, 0);
+	if (get<0>(interval) < 0)
 		return {path, 0};
 
 	 // generate start and add it to the OPEN list

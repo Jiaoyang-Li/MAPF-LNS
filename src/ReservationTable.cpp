@@ -254,46 +254,19 @@ void ReservationTable::updateSIT(int location)
     if (constraint_table.path_table_for_CAT != nullptr and
         !constraint_table.path_table_for_CAT->table.empty())
     {
-        if (location < constraint_table.map_size) // vertex conflict
+        assert(location < constraint_table.map_size);
+        for (int t = 0; t < (int)constraint_table.path_table_for_CAT->table[location].size(); t++)
         {
-            for (int t = 0; t < (int)constraint_table.path_table_for_CAT->table[location].size(); t++)
+            if (!constraint_table.path_table_for_CAT->table[location][t].empty())
             {
-                if (!constraint_table.path_table_for_CAT->table[location][t].empty())
-                {
+                if (constraint_table.path_table_for_CAT->ignore_following_collisions)
                     insertSoftConstraint2SIT(location, t, t+1);
-                }
-            }
-            if (constraint_table.path_table_for_CAT->goals[location] < MAX_TIMESTEP) // target conflict
-                insertSoftConstraint2SIT(location, constraint_table.path_table_for_CAT->goals[location], MAX_TIMESTEP + 1);
-        }
-        else // edge conflict
-        {
-            auto from = location / constraint_table.map_size - 1;
-            auto to = location % constraint_table.map_size;
-            if (from != to)
-            {
-                int t_max = (int) min(constraint_table.path_table_for_CAT->table[from].size(),
-                                      constraint_table.path_table_for_CAT->table[to].size() + 1);
-                for (int t = 1; t < t_max; t++)
-                {
-                    bool found = false;
-                    for (auto a1 : constraint_table.path_table_for_CAT->table[to][t - 1])
-                    {
-                        for (auto a2: constraint_table.path_table_for_CAT->table[from][t])
-                        {
-                            if (a1 == a2)
-                            {
-                                insertSoftConstraint2SIT(location, t, t+1);
-                                found = true;
-                                break;
-                            }
-                            if (found)
-                                break;
-                        }
-                    }
-                }
+                else
+                    insertSoftConstraint2SIT(location, max(0, t-1), t+2);
             }
         }
+        if (constraint_table.path_table_for_CAT->goals[location] < MAX_TIMESTEP) // target conflict
+            insertSoftConstraint2SIT(location, constraint_table.path_table_for_CAT->goals[location], MAX_TIMESTEP + 1);
     }
 
     // soft constraints
@@ -351,15 +324,23 @@ list<tuple<int, int, int, bool, bool>> ReservationTable::get_safe_intervals(int 
     return rst;
 }
 
-Interval ReservationTable::get_first_safe_interval(size_t location)
+// return a safe interval that contains the given timestep
+Interval ReservationTable::getSafeInterval(int location, int timestep)
 {
     if (sit[location].empty())
 	    updateSIT(location);
-    return sit[location].front();
+    for(const auto & i : sit[location])
+    {
+        if (get<0>(i) > timestep)
+            return {-1, -1, false};
+        else if (get<0>(i) <= timestep and get<1>(i) > timestep)
+            return i;
+    }
+    return {-1, -1, false};
 }
 
 // find a safe interval with t_min as given
-bool ReservationTable::find_safe_interval(Interval& interval, size_t location, int t_min)
+bool ReservationTable::find_safe_interval(Interval& interval, int location, int t_min)
 {
 	if (t_min >= min(constraint_table.length_max, MAX_TIMESTEP - 1) + 1)
 		return false;

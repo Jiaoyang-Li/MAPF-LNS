@@ -1,6 +1,5 @@
 .idea
 analysis
 bin
-cmake*
+cmake-*
 exp*
-debug
