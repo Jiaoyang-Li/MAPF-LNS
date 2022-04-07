@@ -295,7 +295,7 @@ bool ECBS::generateRoot()
 			return false;
 		}
         runtime = (double)(clock() - start) / CLOCKS_PER_SEC;
-		if (runtime > time_limit)
+		if (runtime >= time_limit)
         {
 		    cout << "Time out when generating the root CT node" << endl;
             delete root;
