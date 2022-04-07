@@ -76,6 +76,8 @@ struct PIBTPPS_option{
     int timestepLimit ;
 };
 
+double getTimeDurationFrom(clock_t t);
+double getTimeDuration(clock_t t1, clock_t t2);
 
 // Only for three-tuples of std::hash-able types for simplicity.
 // You can of course template this struct to allow other hash functions

@@ -1549,14 +1549,16 @@ bool CBS::generateRoot()
 			paths_found_initially[i] = search_engines[i]->findOptimalPath(*root, initial_constraints[i], paths, i, 0);
 			if (paths_found_initially[i].empty())
 			{
-				cout << "No path exists for agent " << i << endl;
+                if (screen >= 2)
+                    cout << "No path exists for agent " << i << endl;
                 delete root;
 				return false;
 			}
             runtime = (double)(clock() - start) / CLOCKS_PER_SEC;
             if (runtime > time_limit)
             {
-                cout << "Time out when generating the root CT node" << endl;
+                if (screen >= 2)
+                    cout << "Time out when generating the root CT node" << endl;
                 delete root;
                 return false;
             }

@@ -21,3 +21,6 @@ bool isSamePath(const Path& p1, const Path& p2)
 	}
 	return true;
 }
+
+double getTimeDurationFrom(clock_t t) { return (double) (clock() - t) / CLOCKS_PER_SEC; }
+double getTimeDuration(clock_t t1, clock_t t2) { return (double) (t2 - t1) / CLOCKS_PER_SEC; }
