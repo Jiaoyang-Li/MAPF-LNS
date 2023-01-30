@@ -62,10 +62,7 @@ MAPF-LNS is released under USC – Research License. See license.txt for further
 ## References
 [1] Jiaoyang Li, Zhe Chen, Daniel Harabor, Peter J. Stuckey, Sven Koenig.
 Anytime Multi-Agent Path Finding via Large Neighborhood Search.
-In Proceedings of the International Joint Conference on Artificial Intelligence (IJCAI), pages 4127-4135, 2021.           
-[2] Jiaoyang Li, Zhe Chen, Daniel Harabor, Peter J. Stuckey, Sven Koenig.
-Anytime Multi-Agent Path Finding via Large Neighborhood Search: Extended Abstract.
-In Proceedings of the International Conference on Autonomous Agents and Multiagent Systems (AAMAS), pages 1581-1583, 2021.
+In Proceedings of the International Joint Conference on Artificial Intelligence (IJCAI), pages 4127-4135, 2021.         
 
  
 
