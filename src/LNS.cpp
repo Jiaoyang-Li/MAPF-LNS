@@ -638,7 +638,7 @@ bool LNS::generateNeighborByRandomWalk()
         {
             if (i == idx)
             {
-                a = i;
+                a = n;
                 break;
             }
             i++;
