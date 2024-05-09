@@ -8,7 +8,7 @@ Anytime Multi-Agent Path Finding via Large Neighborhood Search
 MAPF-LNS is an effifent anytime algorithm for solving Multi-Agent Path Finding (MAPF). 
 More details can be found in our paper at IJCAI 2021 [1]. 
 
-Note: The code used in the IJCAI paper had a typo for the agent-based neighborhood selection method. After fixing this typo (commit 3e03f6e), the method performs better than what was reported in the paper.
+Note: The code used in the IJCAI paper had a typo for the agent-based neighborhood selection method. After fixing this typo (commit [3e03f6e](https://github.com/Jiaoyang-Li/MAPF-LNS/commit/3e03f6ed6f59194cde1b95362b66aca8e11c639e)), the method performs better than what was reported in the paper.
 
 A stronger version MAPF-LNS2 can be found here: https://github.com/Jiaoyang-Li/MAPF-LNS2
 
